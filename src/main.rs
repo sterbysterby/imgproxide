@@ -1,14 +1,8 @@
-
 mod kernel;
-// use std::process::Output;
 
-// use kernel;
-// use std::fs;
 use image::{ImageBuffer, Luma, GrayImage};
-
 use crate::kernel::Kernel;
-// use Str
-// use image
+
 fn main() {
     let img = image::open("input.jpg")
         .expect("Image not found at specified path.")
@@ -29,7 +23,7 @@ fn main() {
     ];
     let kernel_y = Kernel::new(3,3, filter_y);
     let kernel_x = Kernel::new(3,3, filter_x);
-    let kernel_gauss = Kernel::gaussian(3, 1.0);
+    let kernel_gauss = Kernel::gaussian(15, 10.0);
     
     let mut gauss_out = GrayImage::new(width,height);
 
@@ -57,35 +51,6 @@ fn main() {
 
     output.save("output.png").expect("Failed to save output Image.");
     println!("Image Processing Completed!");
-}
-
-fn _sobel(input : ImageBuffer<Luma<u8>, Vec<u8>>) -> ImageBuffer<Luma<u8>, Vec<u8>>{
-    let height = input.height();
-    let width = input.width();
-    let mut buffer : ImageBuffer<Luma<u8>, Vec<u8>> = ImageBuffer::new(width, height);
-
-    for y in 1..height-1 {
-        for x in 1..width-1 {
-            let val0 = input.get_pixel(x-1, y-1).0[0] as i32; // [x-1, y-1]
-            let val1 = input.get_pixel(x, y-1).0[0] as i32; // [x, y-1]
-            let val2 = input.get_pixel(x+1, y-1).0[0] as i32; // [x+1, y-1]
-            let val3 = input.get_pixel(x-1, y).0[0] as i32; // [x-1, y]
-            let val5 = input.get_pixel(x+1, y).0[0] as i32; // [x+1, y]
-            let val6 = input.get_pixel(x-1, y-1).0[0] as i32; // [x-1, y+1]
-            let val7 = input.get_pixel(x, y).0[0] as i32; // [x, y+1]
-            let val8 = input.get_pixel(x+1, y+1).0[0] as i32; // [x+1, y+1]
-            
-            let gx : i32 = val0 + (val3 * 2) + val6
-                - (val2 + (val5 * 2) + val8);
-            let gy : i32 = val0 + (2 * val1) + val2
-                - (val6 + (2 * val7) + val8);
-
-            let g = ((gx as f64).powi(2) + (gy as f64).powi(2)).sqrt();
-            buffer.put_pixel(x, y, Luma([g as u8]));
-        }
-    }
-
-    buffer
 }
 
 
