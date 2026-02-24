@@ -15,6 +15,7 @@ fn main() {
         .to_luma8();
     let (width, height) = img.dimensions();
     
+
     let filter_y = vec![
         1.0,2.0,1.0,
         0.0,0.0,0.0,
@@ -28,12 +29,24 @@ fn main() {
     ];
     let kernel_y = Kernel::new(3,3, filter_y);
     let kernel_x = Kernel::new(3,3, filter_x);
+    let kernel_gauss = Kernel::gaussian(3, 1.0);
+    
+    let mut gauss_out = GrayImage::new(width,height);
 
+    // sharpen image
+    for y in 0..height {
+        for x in 0..width {
+            let p = kernel_gauss.apply_kernel_on_pixel(&img, x, y);
+            gauss_out.put_pixel(x, y, Luma([p.clamp(0.0,255.0) as u8]));
+        }
+    }
+
+    // apply gradient magnitude
     let mut output = GrayImage::new(width, height);
     for y in 0..height {
         for x in 0..width {
-            let gx = kernel_x.apply_kernel_on_pixel(&img, x, y);
-            let gy = kernel_y.apply_kernel_on_pixel(&img, x, y);
+            let gx = kernel_x.apply_kernel_on_pixel(&gauss_out, x, y);
+            let gy = kernel_y.apply_kernel_on_pixel(&gauss_out, x, y);
             
             let mag = (gx.powi(2) + gy.powi(2)).sqrt();
 
@@ -42,14 +55,6 @@ fn main() {
         }
     }
 
-    let filter = vec![
-        1.0,2.0,1.0,
-        0.0,0.0,0.0,
-        -1.0,-2.0,-1.0
-    ];
-    let kernel = Kernel::new(3,3, filter);
-    
-    
     output.save("output.png").expect("Failed to save output Image.");
     println!("Image Processing Completed!");
 }

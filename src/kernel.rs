@@ -10,6 +10,31 @@ impl Kernel {
         Kernel {height, width, content}
     }
 
+    pub fn gaussian(len : u32, sigma : f32) -> Self{
+        let centre = len / 2;
+        let mut sum = 0.0;
+        let mut filter = vec![0.0; (len * len) as usize];
+
+        for y in 0..len {
+            for x  in 0..len {
+                let dy = y as f32 - centre as f32;
+                let dx = x as f32 - centre as f32;
+
+                let distance = dy * dy + dx * dx;
+                // let value = (1./sigma * ((2.0 * 3.1417) as f32).sqrt()).powf(- 1.0/2.0 * (distance as f32/ (2.0 * sigma as f32).powi(2)));
+                let weight = (-distance / (2.0 * sigma.powi(2))).exp();
+                filter[(y * len + x) as usize] = weight;
+                sum += weight;
+            }
+        }
+        
+        // normalise
+        for weight in filter.iter_mut(){
+            *weight /= sum;
+        }
+
+        Kernel::new(len, len, filter)
+    }
 
     pub fn apply_kernel_on_pixel(&self, input : &ImageBuffer<Luma<u8>, Vec<u8>>, ix : u32, iy : u32) -> f32 {
         let (width, height) = input.dimensions();
