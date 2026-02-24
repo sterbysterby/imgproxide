@@ -1,17 +1,57 @@
 
-use std::fs;
-use image::{ImageBuffer, Luma};
+mod kernel;
+// use std::process::Output;
+
+// use kernel;
+// use std::fs;
+use image::{ImageBuffer, Luma, GrayImage};
+
+use crate::kernel::Kernel;
 // use Str
 // use image
 fn main() {
-    let img = image::open("src/fun.jpg").expect("image not found.");
-    let img_gray = img.to_luma8();
-    let hogs = hogs(&img_gray);
-    let strings: Vec<String> = hogs.iter()
-    .map(|x| x.iter().map(|y| y.to_string()).collect::<Vec<String>>().join(","))
-    .collect();
-    let strings = strings.join("\n");
-    fs::write("src/hogs.txt", strings).expect("Unable to write file");
+    let img = image::open("input.jpg")
+        .expect("Image not found at specified path.")
+        .to_luma8();
+    let (width, height) = img.dimensions();
+    
+    let filter_y = vec![
+        1.0,2.0,1.0,
+        0.0,0.0,0.0,
+        -1.0,-2.0,-1.0
+    ];
+
+    let filter_x = vec![
+        -1.0,0.0,1.0,
+        -2.0,0.0,2.0,
+        -1.0,0.0,1.0
+    ];
+    let kernel_y = Kernel::new(3,3, filter_y);
+    let kernel_x = Kernel::new(3,3, filter_x);
+
+    let mut output = GrayImage::new(width, height);
+    for y in 0..height {
+        for x in 0..width {
+            let gx = kernel_x.apply_kernel_on_pixel(&img, x, y);
+            let gy = kernel_y.apply_kernel_on_pixel(&img, x, y);
+            
+            let mag = (gx.powi(2) + gy.powi(2)).sqrt();
+
+            let p = mag.min(255.0) as u8;
+            output.put_pixel(x, y, Luma([p]));
+        }
+    }
+
+    let filter = vec![
+        1.0,2.0,1.0,
+        0.0,0.0,0.0,
+        -1.0,-2.0,-1.0
+    ];
+    let kernel = Kernel::new(3,3, filter);
+    
+    
+    output.save("output.png").expect("Failed to save output Image.");
+    println!("Image Processing Completed!");
 }
 
 fn _sobel(input : ImageBuffer<Luma<u8>, Vec<u8>>) -> ImageBuffer<Luma<u8>, Vec<u8>>{
