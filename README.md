@@ -4,7 +4,19 @@
 
 this is a repository where I am implementing a few image processing functions into rust.
 
+### Features
+- Custom Kernel Engine
+    - With Dynamic 2D Gaussian Kernel support
+- Edge Detection Pipeline 
+
 ### currently implementing / wip
 
-- sobel filter
-- hog (histogram of oriented gradients)
+- Denoising Pipeline
+- HOGS (histogram of oriented gradients)
+
+### Results
+
+| Input Image | Sobel Edge Detection |
+|:---:|:---:|
+| ![Input](./assets/input.jpg) | ![Output](./assets/outputgmag.png) |
+| *Original Spheal Card* | *Gaussian Blur + Sobel Magnitude* |
