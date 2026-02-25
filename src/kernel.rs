@@ -5,6 +5,12 @@ pub struct Kernel {
     width  : u32,
     content : Vec<f32>,
 }
+
+pub enum SobelDirection {
+    Horizontal,
+    Vertical,
+}
+
 impl Kernel {
     pub fn new(height : u32, width : u32, content : Vec<f32>) -> Self {
         Kernel {height, width, content}
@@ -34,6 +40,23 @@ impl Kernel {
         }
 
         Kernel::new(len, len, filter)
+    }
+
+    pub fn sobel(direction : SobelDirection) -> Self {
+        let content = match direction {
+            SobelDirection::Horizontal =>  vec![
+                1.0,2.0,1.0,
+                0.0,0.0,0.0,
+                -1.0,-2.0,-1.0
+            ],
+            SobelDirection::Vertical => vec![
+                -1.0,0.0,1.0,
+                -2.0,0.0,2.0,
+                -1.0,0.0,1.0
+            ],
+        };
+
+        Kernel::new(3,3, content)
     }
 
     pub fn apply_kernel_on_pixel(&self, input : &ImageBuffer<Luma<u8>, Vec<u8>>, ix : u32, iy : u32) -> f32 {
