@@ -2,16 +2,16 @@ mod kernel;
 mod feature_detect;
 mod helper;
 
-use image::{ImageBuffer, Luma, GrayImage};
-use crate::kernel::Kernel;
+use image::{Luma, GrayImage};
+use crate::{feature_detect::visualize_hog, kernel::Kernel};
 
 fn main() {
-    let img = image::open("input.jpg")
+    let img = image::open("IMG_3664.jpg")
         .expect("Image not found at specified path.")
         .to_luma8();
     let (width, height) = img.dimensions();
 
-    let gauss = Kernel::gaussian(15, 10.0);
+    let gauss = Kernel::gaussian(3, 0.5);
     let sobel_y = Kernel::sobel(kernel::SobelDirection::Vertical);
     let sobel_x = Kernel::sobel(kernel::SobelDirection::Horizontal);
     
@@ -41,4 +41,13 @@ fn main() {
 
     output.save("output.png").expect("Failed to save output Image.");
     println!("Image Processing Completed!");
+    
+    let x = feature_detect::calc_hog(output);
+    x.save("res.hog").expect("Unable to save HOG");
+    
+    println!("HOG Features Extracted!");
+    
+    visualize_hog(&x, 10.0)
+    .save("hogoutput.png")
+    .expect("unable to save image");
 }

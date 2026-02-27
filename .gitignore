@@ -3,3 +3,4 @@
 *.png
 /src/*
 !/src/*.rs
+*.hog

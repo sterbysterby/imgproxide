@@ -1,6 +1,6 @@
 use image::{GrayImage, Luma};
 
-pub fn map_image<F>(img: &GrayImage, mut f: F) -> GrayImage
+pub fn _map_image<F>(img: &GrayImage, mut f: F) -> GrayImage
 where 
     F: FnMut(u32, u32) -> u8 {
         let (w,h) = img.dimensions();
@@ -13,7 +13,7 @@ where
         out
 }
 
-pub fn map_image_f32<F>(img: &GrayImage, mut f: F) -> Vec<f32>
+pub fn _map_image_f32<F>(img: &GrayImage, mut f: F) -> Vec<f32>
 where 
     F: FnMut(u32, u32) -> f32 {
         let (w,h) = img.dimensions();
